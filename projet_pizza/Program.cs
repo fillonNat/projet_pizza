@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Net.NetworkInformation;
 using System.Runtime.CompilerServices;
+using Newtonsoft.Json;
+using System.IO;
+using System.Net;
 
 namespace projet_pizza // Note: actual namespace depends on the project name.
 {
@@ -43,7 +46,7 @@ namespace projet_pizza // Note: actual namespace depends on the project name.
        
         class Pizza
         {
-            protected string nom;
+            public string nom { get; protected set; }
             public float prix { get; protected set; }
             public bool vegetarienne { get; private set; }
             public List<string> ingredients { get; protected set; }
@@ -89,10 +92,9 @@ namespace projet_pizza // Note: actual namespace depends on the project name.
                 return ingredients.Where(i => i.ToLower().Contains(ingredient)).ToList().Count > 0;
             }
         }
-        static void Main(string[] args)
-        {
 
-            //Créer un liste de pizzas
+        static List<Pizza> GetPizzasFromCode()
+        {
             var listePizzas = new List<Pizza> {
                 new Pizza("4 fromages", 9.5f, true, new List<string> {"mozarella", "cantal", "gruyère", "conté"}),
                 new Pizza("pépéroni", 12.0f, false, new List<string> {"pépéroni", "mozarella", "olives", "champigons"}),
@@ -104,42 +106,80 @@ namespace projet_pizza // Note: actual namespace depends on the project name.
                 // new PizzaPersonnalisee(),
                 // new PizzaPersonnalisee(),
             };
+            return listePizzas;
+        }
+        
+        static List<Pizza> GetPizzasFromFile(string filename)
+        {
+            string json = null;
+                    try { 
+                         json = File.ReadAllText(filename);
+                    }
+                    catch {
+                        Console.WriteLine("Erreur de lecture du fichier : " + filename);
+                        return null;
+                    }
 
-            // 1- pizza -> serialiser JSON -> string
-            // 2- écrire dans un fichier texte "pizzas.json"
+                    List<Pizza> listePizzas = null; ;
+                    try
+                    {
+                        listePizzas = JsonConvert.DeserializeObject<List<Pizza>>(json);
+                        return listePizzas;
+                    }
+                    catch {
+                        Console.WriteLine("Erreur : les données json ne sont pas valides");
+                        return null;
+                    }
+            
+        }
 
-            string json = JsonConvert.SerializeObject(personne1);
+        static void GenerateJsonFile(List<Pizza> listePizzas, string filename)
+        {
+            string json = JsonConvert.SerializeObject(listePizzas);
+            filename = "pizzas.json";
+            File.WriteAllText(filename, json);
+            Console.WriteLine("Le fichier a été converti en JSON");
+        }
 
-            foreach (var pizza in listePizzas)
+        static List<Pizza> GetPizzasFromUrl(string url)
+        {
+            var webClient = new WebClient();
+
+            try { 
+            string json = webClient.DownloadString(url);
+             }
+            catch
             {
-                pizza.Afficher();
+                Console.WriteLine("Erreur réseau");
             }
-           /* float pizzaMoinsChere = listePizzas[0].prix;
-            int indexMoinsChere = 0;
-            // La pizza la moins chere
-            for(int i=0; i< listePizzas.Count; i++)
+            List<Pizza> listePizzas = null; ;
+            try
             {
-                if (listePizzas[i].prix < pizzaMoinsChere) { 
-                pizzaMoinsChere = listePizzas[i].prix;
-                indexMoinsChere = i;                
-                }
+                listePizzas = JsonConvert.DeserializeObject<List<Pizza>>(json);
+                return listePizzas;
             }
-            Console.WriteLine("La pizza la moins chère est : " );
-            listePizzas[indexMoinsChere].Afficher();
+            catch
+            {
+                Console.WriteLine("Erreur : les données json ne sont pas valides");
+                return null;
+            }
 
-            float pizzaPlusChere = listePizzas[0].prix;
-            int indexPlusChere = 0;
-            // La pizza la moins chere
-            for (int i = 0; i < listePizzas.Count; i++)
-            {
-                if (listePizzas[i].prix > pizzaPlusChere)
-                {
-                    pizzaPlusChere = listePizzas[i].prix;
-                    indexPlusChere = i;
-                }
+            return listePizzas;
+        }
+        static void Main(string[] args)
+        {
+            var listePizzas = new List<Pizza>();
+            string url = "https://codeavecjonathan.com/res/pizzas2.json";
+            listePizzas = GetPizzasFromUrl(url);
+
+            if (listePizzas != null) { 
+                 foreach (var pizza in listePizzas)
+                 {
+                     pizza.Afficher();
+                 }
             }
-            Console.WriteLine("La pizza la plus chère est : ");
-            listePizzas[indexPlusChere].Afficher();*/
+            
+ 
 
         }
     }
