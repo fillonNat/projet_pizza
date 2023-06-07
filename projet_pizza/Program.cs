@@ -101,21 +101,15 @@ namespace projet_pizza // Note: actual namespace depends on the project name.
                 new Pizza("amoureux de la viande", 14.0f, false, new List<string> {"mozarella", "boeuf haché", "peperoni", "jambon", "saucisses"}),
                 new Pizza("hawaïenne", 12.5f, false, new List<string> {"mozarella", "jambon", "ananas", "tomates"}),
                 new Pizza("toute garnie", 15.0f, false, new List<string> {"mozarella", "peperoni", "tomates", "olives", "poivron"}),
-                new PizzaPersonnalisee(),
-                new PizzaPersonnalisee(),
+                // new PizzaPersonnalisee(),
+                // new PizzaPersonnalisee(),
             };
 
-            // afficher les pizza du prix moins cher au plus cher
+            // 1- pizza -> serialiser JSON -> string
+            // 2- écrire dans un fichier texte "pizzas.json"
 
-            // listePizzas = listePizzas.OrderBy(p => p.prix).ToList();
-            // et du prix plus cher au moins cher
-            // listePizzas = listePizzas.OrderByDescending(p => p.prix).ToList();
+            string json = JsonConvert.SerializeObject(personne1);
 
-            //listePizzas = listePizzas.FindAll(p => p.vegetarienne);
-           // listePizzas = listePizzas.Where(p => p.vegetarienne).ToList();  // autre façon de le faire
-           
-            // listePizzas = listePizzas.Where(p => p.ContientIngredient("oignon")).ToList();
-            //boucler pour afficher les pizzas
             foreach (var pizza in listePizzas)
             {
                 pizza.Afficher();
